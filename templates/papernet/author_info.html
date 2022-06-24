@@ -1,0 +1,132 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+{% load papernet_tags %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div class="content-container" id='paper-info-container'>
+
+            <div class='island-header'>
+                <h2 id='paper title'>{{author.name}}</h2>
+            </div>
+
+            <div id="paper-info">
+
+                <div class="paper-datum">
+                    <div class="paper-key">Publications:</div>
+                    <div class="paper-value">
+                        {{author.paper_count}}
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Citations:</div>
+                    <div class="paper-value">
+                        {{author.citation_count}}
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-value">
+                        <button class="mdc-button mdc-button--outlined" id="update-btn"
+                        @click="updateAuthor({{author.pk}})">
+                          <div class="mdc-button__ripple"></div>
+                          <span class="mdc-button__label">Update</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- References -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Top Publications
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for ref in author.papers %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/paper/{{ref.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{ref.ref}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{ref.title}}
+                        <span class='cites'>({{ref.cites}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End references -->
+
+        <!-- Coauthors -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Top Co-Authors
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for coa in author.coauthors %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/author/{{coa.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{coa.name}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{coa.top_paper}}
+                        <span class='cites'>({{coa.coauthorships}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End coauthors -->
+
+        {% include 'papernet/auth.html' %}
+    </div>
+    
+</div>
+
+
+</body>
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,220 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+{% load papernet_tags %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div class="content-container" id='paper-info-container'>
+
+            <div class='island-header'>
+                <h2 id='paper title'>{{paper.title}}</h2>
+            </div>
+
+            <div id="paper-info">
+                <div class="paper-datum">
+                    <div class="paper-key">Authors:</div>
+                    <div class="paper-value">
+                        {% for author in paper.authors %}
+                        <a href="/papernet/author/{{author.pk}}">{{author.name}}{% if not forloop.last %}, {% endif %}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Year:</div>
+                    <div class="paper-value">
+                        {{paper.year}}
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Journal:</div>
+                    <div class="paper-value">
+                        <a href="/papernet/journal/{{paper.journal.pk}}/">
+                            {{paper.journal.title}}
+                        </a>
+                        <a href="/papernet/journal/{{paper.journal.pk}}/vol/{{paper.volume}}">
+                            Vol. {{paper.volume}}
+                        </a>
+                            
+                            {% if paper.issue %}({{paper.issue}}) {% endif %}
+                            {{paper.pages}}
+                        
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">References:</div>
+                    <div class="paper-value">
+                        <a href="/papernet/papers/?citing_paper={{paper.pk}}">
+                            {{paper.refs}}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Cited By:</div>
+                    <div class="paper-value">
+                        <a href="/papernet/papers/?cited_paper={{paper.pk}}">
+                            {{paper.cites}}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Link:</div>
+                    <div class="paper-value">
+                        <a href="https://doi.org/{{paper.doi}}">
+                            https://doi.org/{{paper.doi}}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Last Updated:</div>
+                    <div class="paper-value">
+                        <span>{{ paper.updated  | nice_date }}</span>
+                        <button class="mdc-button mdc-button--outlined" id="update-btn"
+                        onclick="window.location.href = '/papernet/update/paper/{{paper.pk}}/'">
+                          <div class="mdc-button__ripple"></div>
+                          <span class="mdc-button__label">Update</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Projects:</div>
+                    <div class="paper-value">
+                        {% for project in projects %}
+                            <a class='proj-link' href='/papernet/project/{{project.pk}}/'>{{project.title}}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Add to Project:</div>
+                    <div class="paper-value">
+
+                        <div class='proj-control'>
+                            <select id = "project-select" class='form-control'>
+                                {% for proj in user.reader.projects %}
+                                <option value="{{proj.pk}}">{{proj.title}}</option>
+                                {% endfor %}
+                            </select>
+                                
+                            <button class="mdc-button mdc-button--outlined" id="add-to-proj-btn"
+                            @click="addToProject({{paper.pk}})">
+                              <div class="mdc-button__ripple"></div>
+                              <span class="mdc-button__label">Add</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="paper-datum">
+                    <div class="paper-key">Abstract:</div>
+                    <div class="paper-value">
+                        <p>
+                            {{paper.abstract}}
+                        </[>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+        <!-- References -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    References
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for ref in paper.references %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/paper/{{ref.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{ref.ref}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{ref.title}}
+                        <span class='cites'>({{ref.cites}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End references -->
+
+        <!-- Citations -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Citations
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for ref in paper.citations %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/paper/{{ref.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{ref.ref}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{ref.title}}
+                        <span class='cites'>({{ref.cites}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End references -->
+
+        {% include 'papernet/auth.html' %}
+
+    </div>
+    
+</div>
+
+
+</body>
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{% endblock %}

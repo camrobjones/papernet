@@ -1,0 +1,138 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div id='net-container'>
+
+            <div id="node-container">
+
+                <!-- Citations -->
+                <div id='citation-container' class='ref-container'>
+
+                    <div class='ref mdc-card' v-for='(cite, index) in citations'
+                         :id="'citation-'+index">
+
+                        <div class="mdc-card-content mdc-card__primary-action" tabindex="0" @click='getByDoi(cite.doi)'>
+
+                            <div class='mdc-card-title ref-title'>
+                                [[cite.ref]]
+                            </div>
+
+                            <div class='mdc-card-subtitle ref-subtitle'>
+                                [[cite.title]]
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Paper -->
+                <div id='paper-container'>
+
+                    <div id='paper' v-if='paper.doi' class='mdc-card'>
+
+                        <div class='mdc-card-content'>
+
+                            <div class='mdc-card-title'>
+                                [[paper.ref]]
+                            </div>
+
+                            <div class='mdc-card-subtitle'>
+                                [[paper.title]]
+                            </div>
+
+                            <button class="mdc-button mdc-button--outlined" id="update-btn"
+                            @click="focusPaper">
+                              <div class="mdc-button__ripple"></div>
+                              <span class="mdc-button__label">View</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Cited By -->
+                <div id='cited-by-container' class='ref-container'>
+
+                    <div class='ref mdc-card' v-for='(cite, index) in citedBy'
+                         :id="'reference-'+index">
+
+                        <div class="mdc-card-content mdc-card__primary-action" tabindex="0" @click='getByDoi(cite.doi)'>
+
+                            <div class='mdc-card-title ref-title'>
+                                [[cite.ref]]
+                            </div>
+
+                            <div class='mdc-card-subtitle ref-subtitle'>
+                                [[cite.title]]
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Links -->
+            <div id='link-container'>
+                <svg id='link-svg' xmlns="http://www.w3.org/2000/svg">
+
+                    <line v-for='(cite, index) in citations'
+                          :x1="getX('citation-'+index)"
+                          :y1="getY('citation-'+index)"
+                          :x2="getX('paper')"
+                          :y2="getY('paper')"
+                          strokeWidth = "2"
+                          stroke="#cccccc88"></line>
+
+                    <line v-for='(cite, index) in citedBy'
+                          :x1="getX('reference-'+index)"
+                          :y1="getY('reference-'+index)"
+                          :x2="getX('paper')"
+                          :y2="getY('paper')"
+                          strokeWidth = "2"
+                          stroke="#cccccc88"></line>
+                </svg>
+            </div>
+
+
+        </div>
+
+        {% include 'papernet/auth.html' %}
+
+    </div>
+    
+</div>
+
+
+</body>
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{% endblock %}

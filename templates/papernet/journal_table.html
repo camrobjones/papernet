@@ -1,0 +1,83 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div class='table-header-container'>
+            <h2 class='table-header-title'>
+                Journals
+            </h2>
+            <h4 class='table-header-subtitle'>
+                {{query}}
+            </h4>
+
+        </div>
+
+        <div class='table-container container-fluid'>
+        
+            <div class='table-responsive'>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Abbreviation</th>
+                            <th scope="col">Journal Type</th>
+                            <th scope="col">Paper Count</th>
+                            <th scope="col">Citations</th>
+                            <th scope="col">Cited By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr> 
+                            <td scope="row">{{ forloop.counter }}</td>
+                            <td>
+                                <a href="/papernet/journal/{{row.pk}}/">
+                                    {{ row.title }}
+                                </a>
+                            </td>
+                            <td>{{row.abbreviation}}
+                            </td>
+                            <td>{{ row.journal_type }}</td>
+                            <td>
+                                {{row.paper_count}}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% include 'papernet/auth.html' %}
+
+    </div>
+    
+</div>
+
+
+</body>
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{% endblock %}

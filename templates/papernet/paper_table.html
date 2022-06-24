@@ -1,0 +1,260 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div class='table-header-container'>
+            <h2 class='table-header-title'>
+                [[info.title]]
+            </h2>
+            <h4 class='table-header-subtitle'>
+                [[info.description ]]
+            </h4>
+
+            <div class='upload-container'>
+                <div class='progress-container' v-if='progress.state'>
+                    <div class='progress-bar' :style="{ 'width': progressWidth }">
+                    </div>
+                </div>
+                <button class="mdc-button mdc-button--outlined" id="upload-btn"
+                onclick="$('#csv-upload').trigger('click')">
+                  <div class="mdc-button__ripple"></div>
+                  <span class="mdc-button__label">Upload CSV</span>
+                </button>
+                <input @change='uploadCSV' type='file' id='csv-upload' accept='.csv'>
+
+            </div>
+
+        </div>
+
+        <div class='table-container'>
+        
+            <div class='table-responsive'>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Authors</th>
+                            <th scope="col">Year</th>
+                            <th scope="col">Journal</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Rating</th>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Notes</th>
+                            <th scope="col">Tags</th>
+                            <th scope="col">Citations</th>
+                            <th scope="col">Cited By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(row, index) in papers"> 
+                            <td scope="row">[[index + 1]]</td>
+                            <td>
+                                <a :href="'/papernet/paper/'+row.pk+'/'">
+                                    [[ row.title ]]
+                                </a>
+                                <a :href="'https://doi.org/' + row.doi"
+                                    class='doi-link' target="blank">
+                                    <span class="material-icons">
+                                    launch
+                                    </span>
+                                </a>
+                            </td>
+                            <td>    
+                                <span v-for="(author, authorIndex) in row.authors">
+                                    <a :href="'/papernet/author/'+author.pk">[[author.name ]]</a><span v-if="(authorIndex + 1) < row.authors.length">, </span>
+                            </td>
+                            <td>[[ row.year ]]</td>
+                            <td>
+                                <a :href="`/papernet/journal/${row.journal.pk}`">
+                                    [[ row.journal.title ]]
+                                </a>
+                            </td>
+                            <td class='status'>
+
+                                <!-- <div class='status-container'
+                                onclick="this.firstElementChild.classList.toggle('show')">
+                                    [[ row.meta.status || "NOT SET" ]]
+                                    <div class='table-select-container'> -->
+                                        <select class='form-control table-select'
+                                        @change="modifyPerusal(index, 'status')"
+                                        v-model="row.meta.status">
+                                            <option v-for='status in info.statuses'>
+                                                [[ status.length > 1 ? status : "None" ]]
+                                            </option>
+                                        </select>
+
+                                        <!-- <div class='table-select-other-container'>
+
+                                            <input type='text' class='table-select-input form-control'>
+
+                                            <button class='table-select-btn'
+                                            @click="setStatus(index)">
+                                                <span class="material-icons">
+                                                arrow_forward
+                                                </span>
+                                            </button>
+
+                                        </div> -->
+                                    </div>
+                                    <!-- <button class='table-select-dropdown'>
+                                        <span class="material-icons">
+                                        arrow_drop_down
+                                        </span>
+                                    </button> -->
+                                </div>
+                            </td>
+                            <td>
+                                <input type="number" class='table-input form-control' v-model.number="row.meta.rating" min="0" max="100" @change="modifyPerusal(index, 'rating')">
+                            </td>
+                            <td>
+                                <input type="number" class='table-input form-control' v-model.number="row.meta.priority" min="0" max="10" @change="modifyPerusal(index, 'priority')">
+                            </td>
+                            <td>
+                                <textarea class='table-notes' v-model="row.meta.notes"
+                                          @change="modifyPerusal(index, 'notes')">
+                                </textarea>
+                            </td>
+                            <td class='tag'>
+                                
+                                <div class="mdc-chip-set" role="grid">
+
+                                  <div class="mdc-chip mdc-chip--selected tag" role="row" v-for="tag in row.meta.tags">
+                                    <div class="mdc-chip__ripple"></div>
+                                    <span role="gridcell">
+                                      <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                                        <span class="mdc-chip__text">[[tag]]</span>
+                                      </span>
+                                    </span>
+                                    <span role="gridcell" class="tag-close-container">
+                                        <i class="material-icons mdc-chip__icon mdc-chip__icon--trailing tag-close" tabindex="-1" role="button"
+                                        @click.stop="toggleTag(index, tag)">cancel</i>
+                                      </span>
+                                  </div>
+                                  
+                                </div>
+
+                                <button class="mdc-fab mdc-fab--mini add-tags" aria-label="Favorite"
+                                onclick="this.nextElementSibling.classList.toggle('show')">
+                                      <div class="mdc-fab__ripple"></div>
+                                      <span class="mdc-fab__icon material-icons">add</span>
+                                </button>
+
+                                <div class='tag-filter-popup'>
+                                    <div class='tag-filter-title'>
+                                        Select Filters
+                                    </div>
+
+                                    <div class='tag-filter-body'>
+                                        <div class="mdc-chip-set mdc-chip-set--filter tag-filter-grid" role="grid">
+
+                                          <div class="mdc-chip" role="row" role="row" v-for="tag in info.tags"
+                                          :class="{'mdc-chip--selected': row.meta.tags.includes(tag[0])}"
+                                          @click="toggleTag(index, tag[0])">
+                                              <div class="mdc-chip__ripple"></div>
+                                              <span class="mdc-chip__checkmark" >
+                                                    <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                                                      <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                                                            d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                                                    </svg>
+                                                  </span>
+                                                  <span role="gridcell">
+                                                    <span role="checkbox" tabindex="0" aria-checked="false" class="mdc-chip__primary-action">
+                                                      <span class="mdc-chip__text">[[ tag[0] ]]</span>
+                                                    </span>
+                                                  </span>
+                                            </div>
+
+                                            <div class="mdc-chip new-tag" role="row" role="row">
+                                              <div class="mdc-chip__ripple"></div>
+                                                <span class="mdc-chip__checkmark" >
+                                                    <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                                                      <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                                                            d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                                                    </svg>
+                                                  </span>
+                                                  <span role="gridcell">
+                                                    <span role="checkbox" tabindex="0" aria-checked="false" class="mdc-chip__primary-action new-text-checkbox">
+                                                      <span class="mdc-chip__text">
+                                                        <input type='text' class='new-tag-text' placeholder='Add new tag' @keyup.enter='addNewTag(index)'>
+                                                      </span>
+                                                      <button class='mdc-button add-new-tag' @click='addNewTag(index)'>
+                                                        <span class="mdc-fab__icon material-icons">add</span>
+                                                      </button>
+                                                    </span>
+                                                  </span>
+                                            </div>
+
+                                        </div>
+
+                                        <button class="mdc-button--raised tag-filter-done" onclick="this.parentElement.parentElement.classList.toggle('show')">
+                                          <span class="mdc-button__label">Done</span>
+                                        </button>
+                                      
+                                    </div>
+
+                                    
+                                </div>
+
+                                
+
+
+                            </td>
+                            <td>
+                                <a :href="'/papernet/papers/?citing_paper=' + row.pk">
+                                    [[row.refs]]
+                                </a>
+                            </td>
+                            <td>
+                                <a :href="'/papernet/papers/?cited_paper=' + row.pk">
+                                    [[row.cites]]
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% include 'papernet/auth.html' %}
+
+    </div>
+    
+</div>
+
+
+
+</body>
+
+
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{{info|json_script:"info"}}
+{{papers|json_script:"papers"}}
+<script>
+    app.info = JSON.parse(document.getElementById('info').textContent);
+    app.papers = JSON.parse(document.getElementById('papers').textContent);
+</script>
+
+{% endblock %}

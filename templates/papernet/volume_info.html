@@ -1,0 +1,99 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+{% load papernet_tags %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div class="content-container" id='paper-info-container'>
+
+            <div class='island-header'>
+                <h2 id='paper title'>{{journal.title}} — Volume {{volume}}</h2>
+            </div>
+
+            <div id="paper-info">
+
+                <div class="paper-datum">
+                    <div class="paper-key">Abbreviation:</div>
+                    <div class="paper-value">
+                        {{journal.abbreviation}}
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Journal Type:</div>
+                    <div class="paper-value">
+                        {{journal.journal_type}}
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Publications:</div>
+                    <div class="paper-value">
+                        {{volume.paper_count}}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- References -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Articles
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for ref in journal.papers %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/paper/{{ref.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{ref.ref}} - {{ref.pages}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{ref.title}}
+                        <span class='cites'>({{ref.cites}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    <!-- End references -->
+    {% include 'papernet/auth.html' %}
+
+    </div>
+    
+</div>
+
+
+</body>
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div class="request-login" :class="{hidden: user.is_authenticated}">
+            <a @click="toggleAuth" href="#">Login or Sign up</a> to see 
+            personalized data here.
+        </div>
+
+        <!-- Latest Papers -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Latest Papers For You
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for ref in reader.top.latest %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/paper/{{ref.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{ref.ref}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{ref.title}}
+                        <span class='cites'>({{ref.cites}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End Latest -->
+
+        <!-- Projects -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Your Projects
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for proj in reader.projects %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/project/{{proj.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{proj.title}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{proj.last_active}}
+                        <span class='cites'>({{proj.paper_count}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                  <li class='search-result mdc-list-item'>
+                    <!-- <span class="mdc-list-item__text"> -->
+                      <!-- <span class="mdc-list-item__primary-text"> -->
+                        <input id="new-project-title" v-model="newProjectTitle"
+                               class="form-control mr-sm-2">
+                      <!-- </span> -->
+                        <button class="btn btn-outline-success my-2 my-sm-0"
+                                @click="createProject">
+                            Create Project
+                        </button>
+                      <!-- </span> -->
+                    <!-- </span> -->
+                  </li>
+                </ul>
+
+            </div>
+        </div>
+        <!-- End references -->
+
+        <!-- Top Papers -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Top Papers For You
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for ref in reader.top.top %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/paper/{{ref.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{ref.ref}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{ref.title}}
+                        <span class='cites'>({{ref.cites}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End references -->
+
+        <!-- Top Authors -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Your Top Authors
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for coa in reader.top.authors %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/author/{{coa.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{coa.name}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{coa.paper_count}}
+                        <span class='cites'>({{coa.citation_count}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End Top Authors -->
+
+
+        <!-- Journals -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Your Top Journals
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for journal in reader.top.journals %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/journal/{{journal.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{journal.title}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{journal.papers.0.ref}}
+                        <span class='cites'>({{journal.paper_count}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
+        {% include 'papernet/auth.html' %}
+
+    </div>
+    
+</div>
+
+
+</body>
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{% endblock %}

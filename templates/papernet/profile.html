@@ -1,0 +1,128 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+{% load papernet_tags %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div class="content-container">
+
+            <div id="profile-header" class='island-header'>
+                <div id='user-img-container'>
+                    
+                    <img id='user-img' 
+                         src="{{ reader.image_url }}"/>
+                </div>
+                <h2> {{user.username}} </h2>
+            </div>
+
+            <div class="island-body">
+
+                <div class="paper-datum">
+                    <div class="paper-key">User Since:</div>
+                    <div class="paper-value">
+                        {{ reader.created | nice_date}}
+                    </div>
+                </div>
+
+                <div class="paper-datum">
+                    <div class="paper-key">Bio:</div>
+                    <div class="paper-value">
+                        {{ reader.bio}}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Projects -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Projects
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for proj in reader.projects %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/projects/{{project.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{proj.title}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{proj.last_active}}
+                        <span class='cites'>({{proj.paper_count}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End references -->
+
+        <!-- Citations -->
+        <div class="content-container" id='refs-container'>
+
+            <div class='island-header'>
+                <h3 class='island-title'>
+                    Recent Papers
+                </h3>
+            </div>
+
+            <div class='island-content'>
+
+                <ul class='mdc-list mdc-list--two-line'>
+                    {% for paper in reader.papers %}
+                  <li class='search-result mdc-list-item' 
+                      onclick="window.location.href='/papernet/paper/{{paper.pk}}'">
+                    <span class="mdc-list-item__text">
+                      <span class="mdc-list-item__primary-text">{{paper.ref}}</span>
+                      <span class="mdc-list-item__secondary-text">
+                      {{paper.title}}
+                        <span class='cites'>({{paper.cites}})
+                      </span>
+                    </span>
+                  </li>
+                  {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <!-- End references -->
+
+        {% include 'papernet/auth.html' %}
+
+    </div>
+    
+</div>
+
+
+</body>
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{% endblock %}

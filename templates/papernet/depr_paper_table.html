@@ -1,0 +1,93 @@
+{% extends 'papernet/base.html' %}
+
+{% load static %}
+
+{% block head %}
+
+    <title>Papernet</title>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Panzoom -->
+    <script src='https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js'></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div id='app'>
+
+    {% include 'papernet/nav.html' %}
+
+    <div id='main-container'>
+
+        <div class='table-header-container'>
+            <h2 class='table-header-title'>
+                Papers
+            </h2>
+            <h4 class='table-header-subtitle'>
+                {{query}}
+            </h4>
+
+        </div>
+
+        <div class='table-container container-fluid'>
+        
+            <div class='table-responsive'>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Authors</th>
+                            <th scope="col">Year</th>
+                            <th scope="col">DOI</th>
+                            <th scope="col">Citations</th>
+                            <th scope="col">Cited By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr> 
+                            <td scope="row">{{ forloop.counter }}</td>
+                            <td>
+                                <a href="/papernet/paper/{{row.pk}}/">
+                                    {{ row.title }}
+                                </a>
+                            </td>
+                            <td>{% for author in row.authors %}
+                                    <a href="/papernet/author/{{author.pk}}">{{ author.last_name }}</a>
+                                {% endfor %}
+                            </td>
+                            <td>{{ row.year }}</td>
+                            <td>{{ row.doi }}</td>
+                            <td>
+                                <a href="/papernet/papers/?citing_paper={{row.pk}}">
+                                    {{row.refs}}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="/papernet/papers/?cited_paper={{row.pk}}">
+                                    {{row.cites}}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% include 'papernet/auth.html' %}
+
+    </div>
+    
+</div>
+
+
+</body>
+<script src="{% static 'papernet/papernet.js' %}"></script>
+
+{% endblock %}
