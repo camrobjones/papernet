@@ -375,7 +375,7 @@ class Paper(models.Model):
         """Number of citations the paper contains"""
         return self.citations.count()
 
-    def from_crossref(self, data, citations=True):
+    def from_crossref(self, data, citations=False):
         """Retrieve metadata from crossref"""
         title = data.get('title')
         short_title = data.get('short-title')
@@ -405,6 +405,12 @@ class Paper(models.Model):
         _safe_update(self, update_data, overwrite=True)
 
         self.retrieve_authors(data.get('author', []))
+        self.add_citations(data)
+
+        if citations:
+            self.retrieve_citations()
+
+        self.publication.from_crossref(data)
 
         # Store update info
         self.retrieved = tz.now()

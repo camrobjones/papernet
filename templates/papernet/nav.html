@@ -34,7 +34,7 @@
     </ul>
     <div id='search-container'>
       <div id="search-input-container">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-model="query">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-model="query" @keyup.enter="search">
         <button class="btn btn-outline-success my-2 my-sm-0" type="button" @click="search">Search</button>
       </div>
       <div id='search-results-container' v-if="resultShow">
