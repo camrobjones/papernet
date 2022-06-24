@@ -3,3 +3,4 @@ scratch.py
 backups/
 files/
 frontend/
+*.cpython-36.pyc

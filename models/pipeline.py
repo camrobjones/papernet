@@ -163,7 +163,7 @@ def rate_limit(url=None, params=None):
     # TODO: Different rate limits for different routes
 
     last_request = RequestLog.objects.last()
-    delta = last_request.delta or 0
+    delta = last_request.delta if last_request else 0
 
     if delta > EMAIL_REQUEST_LENGTH:
         rate_limit_warn_email(last_request)
