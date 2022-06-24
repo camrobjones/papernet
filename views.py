@@ -714,7 +714,7 @@ Monitoring
 def getlogs(request):
     """Display logging data"""
     interval = request.GET.get('interval', 'H')
-    logs = crossref.RequestLog.objects.all()
+    logs = models.RequestLog.objects.all()
     log_data = [[log.url, log.end_time, log.delta] for log in logs]
     df = pd.DataFrame(log_data)
     df.columns = ['url', 'end_time', 'delta']
@@ -741,41 +741,4 @@ def data_creation(request):
     colnames = list(df.columns)
     return render(request, 'papernet/monitor.html', {'data': data,
                                                      'colnames': colnames})
-
-
-
-
-# [p.delete() for p in models.Paper.objects.all()]
-# paper = retrieve(doi)
-# paper.retrieve_citations()
-
-# top = .objects. cited_by
-
-# top_papers = models.Paper.objects \
-#                 .annotate(num_cited_by=Count('cited_by')) \
-#                 .order_by('-num_cited_by')[:10]
-
-"""
-scratch
-
-from papernet.views import retrieve
-# doi = "10.1080/23273798.2015.1008524"
-# doi = "10.1207/S15326950DP3102_02"
-# doi = "10.1111/cogs.12777"
-doi =  "10.1177/1745691619885860"
-p = retrieve(doi)
-p.retrieve_citations()
-p.data
-citations = p.cited_papers
-citations_data = [c.data for c in citations if c]
-
-----
-get data
-
-from papernet.views import retrieve
-doi = "10.1111/tops.12096"
-paper = retrieve(doi)
-
-"""
-
 
