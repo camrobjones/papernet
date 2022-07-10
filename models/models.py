@@ -404,13 +404,10 @@ class Paper(models.Model):
         # safe update
         _safe_update(self, update_data, overwrite=True)
 
-        self.retrieve_authors(data.get('author', []))
-        self.add_citations(data)
-
         if citations:
             self.retrieve_citations()
 
-        self.publication.from_crossref(data)
+        # self.publication.from_crossref(data)
 
         # Store update info
         self.retrieved = tz.now()

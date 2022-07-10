@@ -134,7 +134,10 @@ def update_paper(request, pk):
     """Refresh data for paper"""
     paper = models.Paper.objects.get(pk=pk)
 
-    paper.retrieve(citations=False, force=True)
+    data = sources.get_work(doi=paper.doi)
+    aux.add_work(data, force=True)
+
+    # paper.retrieve(citations=False, force=True)
     tasks.retrieve_citations.delay(paper.pk)
 
     return paper_info(request, pk)

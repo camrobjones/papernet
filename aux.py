@@ -206,6 +206,9 @@ def add_work(data, force=False):
 
     paper.from_crossref(data)
 
+    # Authors
+    paper.retrieve_authors(data.get('author', []))
+
     # Journal
     issn = cleaning.get_issn(data)
 
