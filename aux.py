@@ -213,7 +213,7 @@ def add_work(data, force=False):
     issn = cleaning.get_issn(data)
 
     if issn['issn']:
-        journal = get_journal_by_issn(issn)
+        journal = get_journal_by_issn(issn["issn"])
 
         if journal is None:
             try:

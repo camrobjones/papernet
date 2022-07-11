@@ -291,7 +291,7 @@ class Paper(models.Model):
             publication = Publication.objects.create(paper=self)
             return publication
 
-        return publications.first()
+        return publications.last()
 
     @property
     def year(self):
