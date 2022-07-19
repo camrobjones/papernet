@@ -189,6 +189,7 @@ def search_cr(request):
             print("No DOI for res, ", res)
             # TODO: log/flag
             continue
+        aux.add_work(res, citations=False)
         paper, _ = models.Paper.objects.get_or_create(doi=res["DOI"])
         paper.from_crossref(res)
         paper.retrieve_authors(res.get('author', []))

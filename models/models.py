@@ -287,7 +287,7 @@ class Paper(models.Model):
             logger.error("Paper id(%s) has %s publications.",
                          self.pk, publications.count())
 
-        if publications.count() == 0:
+        if publications.count() == 0 and self.retrieved:
             publication = Publication.objects.create(paper=self)
             return publication
 

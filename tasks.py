@@ -11,7 +11,8 @@ from papernet.models import Paper, Project
 from papernet.aux import add_work, get_work, get_reader, add_to_project
 
 
-logger = logging.getLogger('papernet')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 # @app.task(bind=True)
 @shared_task
@@ -34,9 +35,12 @@ def get_author_papers(author):
 @shared_task
 def get_journal_papers(issn):
     """Retrieve papers in journal"""
-    logger.debug("Task: get_journal_papers(issn=%s)", issn)
-    for work in crossref.scrape_journal(issn):
+    logger.info("Task: get_journal_papers(issn=%s)", issn)
+    works = 0
+    for work in crossref.get_works(filters=f"issn:{issn}", limit=200):
+        logger.debug("Adding work %s, %s, %s", works, work["DOI"], work['ISSN'])
         add_work(work)
+        works += 1
 
 
 @shared_task(bind=True)

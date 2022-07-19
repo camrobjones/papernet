@@ -18,6 +18,7 @@ from papernet.data import cleaning
 from papernet.models import Reader, Project, Paper, Perusal, Reference
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 """
@@ -194,7 +195,7 @@ def get_work(doi_raw, retrieve=True):
     return paper
 
 
-def add_work(data, force=False):
+def add_work(data, citations=True, force=False):
     """Add work to database from crossref data"""
     doi = data['DOI']
     paper, created = Paper.objects.get_or_create(doi=doi)
@@ -236,10 +237,11 @@ def add_work(data, force=False):
     publication.from_crossref(data)
 
     # Citations
-    logger.debug("Adding citations for %s", paper)
-    paper.add_citations(data)
+    if citations:
+        logger.debug("Adding citations for %s", paper)
+        paper.add_citations(data)
 
-    _ = get_cited_by(paper)
+        _ = get_cited_by(paper)
 
     paper.save()
     return paper

@@ -1,6 +1,5 @@
-Django==3.1.1
-requests==2.23.0
-pandas==1.1.2
-pdfminer.six==20181108
-celery==4.4.7
+celery==5.2.7
+Django==3.2.4
+pandas==1.4.3
 pdfminer==20191125
+requests==2.28.1

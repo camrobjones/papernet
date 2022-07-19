@@ -125,16 +125,18 @@ def get_works(filters=None, sort='issued', chunksize=20, limit=None,
     count = 0
     total = "Unknown"
 
-    # Query Params
-    params = {"rows": chunksize,
-              "filter": filters,
-              "offset": offset,
-              "sort": sort,
-              "order": order}
-
     while not finished:
         logger.debug("Getting results %s - %s of %s", offset,
                      offset + chunksize, total)
+
+        # Query Params
+        params = {
+            "rows": chunksize,
+            "filter": filters,
+            "offset": offset,
+            "sort": sort,
+            "order": order
+        }
 
         # filters = filters or {}
         # filters['issn'] = issn
@@ -163,12 +165,13 @@ def get_works(filters=None, sort='issued', chunksize=20, limit=None,
             count += 1
 
         if len(items) < chunksize or offset >= limit:
+            logger.info("Setting finished to true. len(items)=%s, chunksize=%s, offset=%s, limit=%s",
+                len(items), chunksize, offset, limit)
             finished = True
 
         offset += chunksize
 
     logger.info("%s papers of %s retrieved", count, total)
-
 
 """
 Open citation functions
